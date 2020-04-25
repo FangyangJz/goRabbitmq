@@ -1,23 +1,29 @@
 
-# docker
-sudo service docker start
+# Docker
+启动docker服务:
+> sudo service docker start
 
-http/web-stomp	::	15674
-stomp	::	61613
+插件端口占用情况:
+* http/web-stomp	::	15674
+* stomp	::	61613
 
-sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:3-management
+官方给出的容器启动命令:
+> sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:3-management
 
-sudo docker container exec -it rabbitmq bash
-rabbitmq-plugins enable rabbitmq_stomp
-rabbitmq-plugins enable rabbitmq_web_stomp
+插件启动命令:
+> sudo docker container exec -it rabbitmq bash
 
-# 会退出没起作用
-sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:3-management sh -c "rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-plugins enable rabbitmq_web_stomp"
+> rabbitmq-plugins enable rabbitmq_stomp
 
-# 通过构建 Dockerfile
-FROM rabbitmq:3-management
-RUN rabbitmq-plugins enable --offline rabbitmq_stomp rabbitmq_web_stomp
+> rabbitmq-plugins enable rabbitmq_web_stomp
 
-sudo docker build -t rabbitmq:fangyang .
-构建了一个带插件的镜像
-sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:fangyang
+考虑使用docker命令在container启动之后, 在命令行启动插件, 以下命令失败, 容器会退出, 没起作用
+
+> sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:3-management sh -c "rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-plugins enable rabbitmq_web_stomp"
+
+# Dockerfile使用
+根据Dockerfile构建新的镜像(增加插件支持)
+> sudo docker build -t rabbitmq:fangyang .
+
+启动容器:
+> sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15674:15674 -p 61613:61613 -p 15672:15672 rabbitmq:fangyang
